@@ -1,6 +1,6 @@
-# 🧠 Zubari AI Study Buddy - Flask Web Application
+# 🧠 Zubari AI Studdy Buddy - Flask Web Application
 
-🚀 **Zubari AI Study Buddy** is a comprehensive Flask-based web application that leverages artificial intelligence to enhance the learning experience. The platform offers multiple AI-powered tools including question generation, text summarization, question answering, and personalized study plan creation.
+🚀 **Zubari AI Studdy Buddy** is a comprehensive Flask-based web application that leverages artificial intelligence to enhance the learning experience. The platform offers multiple AI-powered tools including question generation, text summarization, question answering, and personalized study plan creation.
 
 ---
 
@@ -32,7 +32,7 @@
 ## 📂 Project Structure
 
 ```
-📦 Zubari-AI-Study-Buddy/
+📦 Zubari-AI-Studdy-Buddy/
 ├── 📁 public/              # Static frontend files
 │   ├── 📄 index.html       # Homepage
 │   ├── 📄 login.html       # Login page
@@ -59,8 +59,8 @@
 
 ### Step 1: Clone the Repository
 ```bash
-git clone https://github.com/yourusername/zubari-ai-study-buddy.git
-cd zubari-ai-study-buddy
+git clone https://github.com/yourusername/zubari-ai-studdy-buddy.git
+cd zubari-ai-studdy-buddy
 ```
 
 ### Step 2: Create Virtual Environment
@@ -119,107 +119,253 @@ The application will be available at: **http://localhost:3000**
 
 ---
 
-## 📱 How to Use the Application
+## 📱 Complete Step-by-Step User Guide
 
-### 1. **Account Creation**
-1. Navigate to the homepage
-2. Click **"Sign Up"** in the navigation bar
-3. Enter your email and create a secure password
-4. Confirm your password and click **"Create Account"**
-5. You'll be automatically logged in and redirected to the homepage
+### 🚀 Getting Started
 
-### 2. **Accessing AI Tools**
-1. **Login** to your account if not already logged in
-2. From the homepage, click on any of the four AI tool cards:
-   - **Question Generator** ❓
-   - **Text Summarizer** 📝
-   - **Question Answering** 🤖
-   - **Study Plan Generator** 📅
+#### Step 1: Create Your Account
+1. **Open your web browser** and navigate to `http://localhost:3000`
+2. **Click "Sign Up"** in the top-right corner of the navigation bar
+3. **Fill in the registration form**:
+   - Enter a valid email address
+   - Create a strong password (minimum 8 characters recommended)
+   - Confirm your password by typing it again
+4. **Click "Create Account"** to complete registration
+5. **Automatic Login**: You'll be automatically logged in and redirected to the homepage
 
-### 3. **Using Question Generator**
-1. Click on the **Question Generator** tool
-2. Paste or type a paragraph of text in the input field
-3. Click **"Generate Questions"**
-4. Review the AI-generated practice questions
-5. Use these questions to test your understanding
-
-### 4. **Using Text Summarizer**
-1. Select the **Text Summarizer** tool
-2. Paste long text, articles, or documents
-3. Click **"Summarize"**
-4. Get a concise summary highlighting key points
-5. Use the summary for quick review or note-taking
-
-### 5. **Using Question Answering**
-1. Access the **Question Answering** tool
-2. Provide **context** (background information or text)
-3. Enter your specific **question**
-4. Click **"Get Answer"**
-5. Receive an AI-generated answer based on the context
-
-### 6. **Using Study Plan Generator**
-1. Open the **Study Plan Generator** tool
-2. Fill in the required fields:
-   - **Syllabus**: Course or subject name
-   - **Topics**: Specific topics to cover
-   - **Start Date**: When you want to begin studying
-   - **Deadline**: Your target completion date
-3. Click **"Generate Plan"**
-4. Receive a structured, time-based study schedule
-
-### 7. **Understanding Usage Limits**
-- **Free Tier**: 5 AI requests per month
-- **Premium**: Unlimited AI requests
-- Usage counter is displayed at the top of the tools page
-- When limit is reached, you'll be prompted to upgrade
-
-### 8. **Upgrading to Premium**
-1. Click **"View Plans"** from the homepage banner or when prompted
-2. Choose between:
-   - **Monthly Plan**: KES 1,000/month
-   - **Yearly Plan**: KES 10,000/year (Save KES 2,000!)
-3. Click **"Choose Monthly"** or **"Choose Yearly"**
-4. Complete payment through Paystack secure checkout
-5. Enjoy unlimited AI requests immediately after payment
-
-### 9. **Account Management**
-- **View Usage**: Check remaining requests in the top navigation
-- **Logout**: Click your email in the navigation, then "Logout"
-- **Subscription Status**: Visible in the user menu area
+#### Step 2: Explore the Homepage
+After successful registration, you'll see:
+- **Welcome message** with your personalized greeting
+- **Four AI tool cards** showcasing available features
+- **Premium banner** highlighting upgrade options
+- **Navigation bar** showing your email and logout option
 
 ---
 
-## 💳 Payment Integration
+### 🛠️ Using the AI Tools
 
-The application uses **Paystack** for secure payment processing:
+#### 🔍 Tool 1: Question Generator
 
-- **Supported Currency**: Kenyan Shillings (KES)
-- **Payment Methods**: Cards, Mobile Money, Bank Transfer
-- **Security**: PCI DSS compliant payment processing
-- **Instant Activation**: Premium features activate immediately after successful payment
+**Purpose**: Generate practice questions from any text to test your understanding
+
+**Step-by-Step Process**:
+1. **Access the Tool**:
+   - From the homepage, click on the **"Question Generator"** card (❓ icon)
+   - You'll be redirected to the tools page with the Question Generator active
+
+2. **Input Your Content**:
+   - In the large text area, paste or type a paragraph of text
+   - This could be from textbooks, articles, lecture notes, or any educational content
+   - **Example**: "Photosynthesis is the process by which plants convert sunlight into energy..."
+
+3. **Generate Questions**:
+   - Click the **"Generate Questions"** button
+   - Wait for the AI to process your text (usually 2-3 seconds)
+
+4. **Review Results**:
+   - Generated questions will appear below the form
+   - Each question is designed to test different aspects of comprehension
+   - Use these questions for self-assessment or study group discussions
+
+**Best Practices**:
+- Use paragraphs of 50-300 words for optimal results
+- Include key concepts and important details in your input text
+- Save generated questions for later review
 
 ---
 
-## 🔒 Security Features
+#### 📝 Tool 2: Text Summarizer
 
-- **Password Hashing**: bcrypt encryption for secure password storage
-- **Session Management**: Secure user sessions with Flask
-- **SQL Injection Protection**: Parameterized queries
-- **Input Validation**: Server-side validation for all user inputs
-- **Authentication Middleware**: Protected routes for authenticated users only
+**Purpose**: Convert long texts into concise, easy-to-understand summaries
+
+**Step-by-Step Process**:
+1. **Access the Tool**:
+   - Click on the **"Text Summarizer"** card (📝 icon) from the homepage
+   - The summarizer interface will load
+
+2. **Input Your Text**:
+   - Paste long articles, research papers, or extensive notes
+   - The tool works best with texts of 200+ words
+   - **Example**: Copy an entire Wikipedia article or research paper
+
+3. **Generate Summary**:
+   - Click the **"Summarize"** button
+   - The AI will process and condense your text
+
+4. **Use Your Summary**:
+   - Review the concise summary highlighting key points
+   - Use for quick revision before exams
+   - Create study notes from lengthy materials
+
+**Best Practices**:
+- Use for academic papers, long articles, or textbook chapters
+- Review the summary alongside the original text initially
+- Save summaries for quick reference during exam preparation
 
 ---
 
-## 🎨 Design Philosophy
+#### 🤖 Tool 3: Question Answering
 
-The application follows modern web design principles:
+**Purpose**: Get specific answers to your questions based on provided context
 
-- **Apple-inspired Aesthetics**: Clean, minimalist interface
-- **Responsive Design**: Works seamlessly on all devices
-- **Gradient Backgrounds**: Beautiful visual appeal
-- **Micro-interactions**: Smooth hover effects and transitions
-- **Accessibility**: High contrast ratios and readable fonts
-- **Progressive Enhancement**: Works without JavaScript for basic functionality
+**Step-by-Step Process**:
+1. **Access the Tool**:
+   - Click on the **"Question Answering"** card (🤖 icon)
+   - The Q&A interface will open
+
+2. **Provide Context**:
+   - In the **"Context"** field, paste relevant background information
+   - This could be a paragraph from your textbook, lecture notes, or study materials
+   - **Example**: "The water cycle involves evaporation, condensation, and precipitation..."
+
+3. **Ask Your Question**:
+   - In the **"Question"** field, type your specific question
+   - Be clear and specific for better answers
+   - **Example**: "What role does temperature play in evaporation?"
+
+4. **Get Your Answer**:
+   - Click **"Get Answer"**
+   - The AI will analyze the context and provide a relevant answer
+   - The answer will be based specifically on the context you provided
+
+**Best Practices**:
+- Provide comprehensive context for better answers
+- Ask specific, focused questions
+- Use this tool when you need clarification on specific concepts
+
+---
+
+#### 📅 Tool 4: Study Plan Generator
+
+**Purpose**: Create personalized, time-based study schedules
+
+**Step-by-Step Process**:
+1. **Access the Tool**:
+   - Click on the **"Study Plan Generator"** card (📅 icon)
+   - The study plan form will appear
+
+2. **Fill in Required Information**:
+   - **Syllabus**: Enter your course or subject name
+     - *Example*: "Introduction to Biology", "Advanced Mathematics", "World History"
+   
+   - **Topics**: List the specific topics you need to cover
+     - *Example*: "Cell structure, Photosynthesis, Genetics, Evolution"
+   
+   - **Start Date**: Select when you want to begin studying
+     - Use the date picker to choose your preferred start date
+   
+   - **Deadline**: Set your target completion date
+     - This could be an exam date or personal goal
+
+3. **Generate Your Plan**:
+   - Click **"Generate Plan"** after filling all fields
+   - The AI will create a structured study schedule
+
+4. **Follow Your Plan**:
+   - Review the generated timeline and daily tasks
+   - Adjust your schedule based on the recommendations
+   - Use the plan as a roadmap for your studies
+
+**Best Practices**:
+- Be realistic with your timeline
+- Include buffer time for review and practice
+- Break down complex topics into smaller, manageable sections
+
+---
+
+### 💎 Premium Subscription Guide
+
+#### Understanding Usage Limits
+- **Free Tier**: 5 AI requests per month across all tools
+- **Premium**: Unlimited AI requests with no restrictions
+- **Usage Tracking**: Your remaining requests are displayed at the top of the tools page
+
+#### Upgrading to Premium
+
+**Step 1: Access Premium Plans**
+- Click **"View Plans"** from the homepage banner, or
+- When you reach your free tier limit, click **"View Premium Plans"** in the upgrade modal
+
+**Step 2: Choose Your Plan**
+- **Monthly Plan**: KES 1,000/month - Perfect for short-term intensive study periods
+- **Yearly Plan**: KES 10,000/year - **Save KES 2,000!** - Best value for ongoing learning
+
+**Step 3: Complete Payment**
+1. Click **"Choose Monthly"** or **"Choose Yearly"**
+2. **Paystack Checkout** will open automatically
+3. **Enter Payment Details**:
+   - Card number, expiry date, and CVV
+   - Or choose Mobile Money (M-Pesa, Airtel Money)
+   - Or select Bank Transfer option
+4. **Confirm Payment** by clicking "Pay Now"
+5. **Instant Activation**: Premium features activate immediately after successful payment
+
+**Step 4: Enjoy Premium Benefits**
+- Unlimited AI requests across all tools
+- Priority processing for faster responses
+- Access to advanced features as they're released
+
+---
+
+### 👤 Account Management
+
+#### Checking Your Status
+- **Usage Information**: Displayed at the top of the tools page
+- **Subscription Status**: Visible in your user menu
+- **Request Counter**: Shows remaining free requests or "Unlimited" for premium users
+
+#### Managing Your Account
+1. **View Account Info**: Click on your email in the navigation bar
+2. **Logout**: Click "Logout" to securely end your session
+3. **Subscription Management**: Premium status and expiry dates are automatically tracked
+
+---
+
+### 🔧 Troubleshooting Common Issues
+
+#### Login Problems
+- **Forgot Password**: Currently handled manually - contact support
+- **Account Not Found**: Ensure you're using the correct email address
+- **Login Fails**: Check your internet connection and try again
+
+#### Tool Usage Issues
+- **No Response**: Check your internet connection
+- **Error Messages**: Read the specific error and follow the suggested action
+- **Slow Performance**: Large texts may take longer to process
+
+#### Payment Issues
+- **Payment Fails**: Try a different payment method or contact your bank
+- **Premium Not Activated**: Refresh the page and check your subscription status
+- **Refund Requests**: Contact support with your payment reference
+
+---
+
+### 📊 Usage Tips for Maximum Benefit
+
+#### For Students
+- **Daily Practice**: Use the Question Generator daily with your reading materials
+- **Exam Preparation**: Summarize lengthy chapters before exams
+- **Homework Help**: Use Q&A for clarification on difficult concepts
+- **Time Management**: Create study plans for each subject
+
+#### For Educators
+- **Content Creation**: Generate questions for quizzes and tests
+- **Lesson Planning**: Summarize research materials for lesson preparation
+- **Student Support**: Help students create effective study schedules
+
+#### For Professionals
+- **Skill Development**: Create learning plans for new skills
+- **Research**: Summarize industry reports and papers
+- **Knowledge Testing**: Generate questions to assess understanding
+
+---
+
+## 🔒 Security & Privacy
+
+- **Password Security**: All passwords are encrypted using bcrypt hashing
+- **Session Management**: Secure user sessions with automatic timeout
+- **Data Protection**: User data is stored securely in MySQL database
+- **Payment Security**: All payments processed through Paystack's secure, PCI-compliant system
 
 ---
 
@@ -240,12 +386,14 @@ python app.py
 
 ## 🔮 Future Enhancements
 
-- 🤖 **Real AI Integration**: Replace mock responses with actual AI models
+- 🤖 **Real AI Integration**: Replace mock responses with actual AI models (OpenAI, Anthropic)
 - 📊 **Analytics Dashboard**: Track learning progress and statistics
 - 🎯 **Personalized Recommendations**: AI-driven study suggestions
 - 📱 **Mobile App**: Native iOS and Android applications
 - 🌍 **Multi-language Support**: Support for multiple languages
 - 🔗 **API Access**: RESTful API for third-party integrations
+- 📚 **Study Groups**: Collaborative learning features
+- 🏆 **Gamification**: Points, badges, and leaderboards
 
 ---
 
@@ -282,8 +430,46 @@ For questions, support, or collaboration opportunities:
 
 - **Flask Community** for the excellent web framework
 - **MySQL** for reliable database management
-- **Paystack** for seamless payment processing
+- **Paystack** for seamless payment processing in Kenya
 - **Open Source Community** for inspiration and resources
+
+---
+
+## 📋 System Requirements
+
+### Minimum Requirements
+- **Python**: 3.8+
+- **MySQL**: 8.0+
+- **RAM**: 512MB
+- **Storage**: 100MB free space
+- **Internet**: Stable connection for AI features
+
+### Recommended Requirements
+- **Python**: 3.10+
+- **MySQL**: 8.0+ with InnoDB engine
+- **RAM**: 1GB+
+- **Storage**: 500MB free space
+- **Internet**: Broadband connection for optimal performance
+
+---
+
+## 🔍 API Endpoints Reference
+
+### Authentication
+- `POST /api/signup` - Create new user account
+- `POST /api/login` - User authentication
+- `POST /api/logout` - End user session
+- `GET /api/user-status` - Get current user information
+
+### AI Tools
+- `POST /api/generate-questions` - Generate questions from text
+- `POST /api/summarize` - Summarize long text
+- `POST /api/answer-question` - Answer questions with context
+- `POST /api/generate-study-plan` - Create personalized study plans
+
+### Payments
+- `POST /api/initiate-payment` - Start premium subscription payment
+- `POST /api/verify-payment` - Verify and activate premium subscription
 
 ---
 

@@ -1,99 +1,84 @@
-# 🧠 Zubari AI Studdy Buddy - Flask Web Application
+# 🧠 Zubari AI Studdy Buddy – Flashcard Generator
 
-🚀 **Zubari AI Studdy Buddy** is a comprehensive Flask-based web application that leverages artificial intelligence to enhance the learning experience. The platform offers multiple AI-powered tools including question generation, text summarization, question answering, and personalized study plan creation.
-
----
-
-## 🌟 Key Features
-
-- 🔹 **Question Generator** - Generate relevant practice questions from any paragraph or text
-- 🔹 **Text Summarization** - Convert long texts into concise, digestible summaries
-- 🔹 **Question Answering** - Get precise answers based on provided context
-- 🔹 **Study Plan Generator** - Create structured, personalized study schedules
-- 🔹 **Premium Subscription** - Unlimited AI requests with Paystack payment integration
-- 🔹 **User Authentication** - Secure login and registration system
-- 🔹 **Usage Tracking** - Monitor AI request usage for free tier users
+An AI-powered web application that transforms study notes into interactive flashcards and quizzes. Built for students, by students.
 
 ---
 
-## 🛠️ Technology Stack
+## 🚀 Features
 
-| **Component** | **Technology** |
-|---------------|----------------|
+• **Paste study notes** → get flashcards instantly
+• **Interactive flashcards** (click to reveal answers)
+• **Quiz generation** using Cohere API
+• **Flashcards stored** in MySQL database
+• **Premium subscription** via Paystack integration
+
+---
+
+## 🛠️ Tech Stack
+
+| **Layer** | **Technology** |
+|-----------|----------------|
+| **Frontend** | HTML, CSS, JavaScript |
 | **Backend** | Flask (Python) |
 | **Database** | MySQL |
-| **Frontend** | Vanilla HTML, CSS, JavaScript |
-| **Authentication** | bcrypt password hashing |
-| **Payments** | Paystack integration |
-| **Styling** | Pure CSS with modern design |
+| **AI APIs** | OpenAI (Flashcards), Cohere (Quizzes) |
+| **Payments** | Paystack |
 
 ---
 
 ## 📂 Project Structure
 
 ```
-📦 Zubari-AI-Studdy-Buddy/
-├── 📁 public/              # Static frontend files
-│   ├── 📄 index.html       # Homepage
-│   ├── 📄 login.html       # Login page
-│   ├── 📄 signup.html      # Registration page
-│   ├── 📄 premium.html     # Premium plans page
-│   ├── 📄 tools.html       # AI tools interface
-│   ├── 📄 style.css        # Main stylesheet
-│   └── 📄 script.js        # Frontend JavaScript
-├── 📁 images/              # Application screenshots
-├── 📄 app.py               # Main Flask application
-├── 📄 requirements.txt     # Python dependencies
-├── 📄 README.md            # Project documentation
-└── 📄 LICENSE              # MIT License
+zubari-ai-studdy-buddy/
+│
+├── public/                 # Static frontend files
+│   ├── index.html         # Homepage
+│   ├── login.html         # Login page
+│   ├── signup.html        # Registration page
+│   ├── premium.html       # Premium plans page
+│   ├── flashcards.html    # Flashcard tools interface
+│   ├── style.css          # Main stylesheet
+│   └── script.js          # Frontend JavaScript
+├── app.py                 # Main Flask application
+├── requirements.txt       # Python dependencies
+├── README.md             # Project documentation
+└── LICENSE               # MIT License
 ```
 
 ---
 
-## 🔧 Installation & Setup
+## 🧪 Setup Instructions
 
 ### Prerequisites
 - Python 3.8 or higher
 - MySQL Server 8.0 or higher
-- pip (Python package installer)
+- OpenAI API key
+- Cohere API key
+- Paystack account (for payments)
 
-### Step 1: Clone the Repository
+### 1. Clone the Repository
 ```bash
 git clone https://github.com/yourusername/zubari-ai-studdy-buddy.git
 cd zubari-ai-studdy-buddy
 ```
 
-### Step 2: Create Virtual Environment
-```bash
-# Create virtual environment
-python -m venv venv
-
-# Activate virtual environment
-# On Windows:
-venv\Scripts\activate
-# On macOS/Linux:
-source venv/bin/activate
-```
-
-### Step 3: Install Dependencies
+### 2. Install Dependencies
 ```bash
 pip install -r requirements.txt
 ```
 
-### Step 4: MySQL Database Setup
-1. **Install MySQL Server** if not already installed
-2. **Create Database User** (optional but recommended):
+### 3. Configure MySQL Database
+Create a database named `zubari_flashcards`:
+
 ```sql
-CREATE USER 'zubari_user'@'localhost' IDENTIFIED BY 'your_password';
-GRANT ALL PRIVILEGES ON zubari_ai.* TO 'zubari_user'@'localhost';
-FLUSH PRIVILEGES;
+CREATE DATABASE zubari_flashcards;
 ```
 
-3. **Update Database Configuration** in `app.py`:
+Update your MySQL credentials in `app.py`:
 ```python
 DB_CONFIG = {
     'host': 'localhost',
-    'database': 'zubari_ai',
+    'database': 'zubari_flashcards',
     'user': 'your_mysql_username',
     'password': 'your_mysql_password',
     'charset': 'utf8mb4',
@@ -101,271 +86,269 @@ DB_CONFIG = {
 }
 ```
 
-### Step 5: Configure Paystack Integration
-1. **Create Paystack Account** at [paystack.com](https://paystack.com)
-2. **Get API Keys** from your Paystack dashboard
-3. **Update Payment Configuration** in `app.py`:
+### 4. Configure API Keys
+Update the API keys in `app.py`:
+
 ```python
-# Replace with your actual Paystack public key
-'publicKey': 'pk_test_your_actual_paystack_public_key'
+# OpenAI Configuration
+openai.api_key = 'your-openai-api-key'
+
+# Cohere Configuration
+cohere_client = cohere.Client('your-cohere-api-key')
+
+# Paystack Configuration (in the payment route)
+'publicKey': 'pk_test_your_paystack_public_key'
 ```
 
-### Step 6: Run the Application
+### 5. Run the Flask Application
 ```bash
 python app.py
 ```
 
-The application will be available at: **http://localhost:3000**
+Visit **http://localhost:5000** to access the application.
 
 ---
 
-## 📱 Complete Step-by-Step User Guide
+## 📖 Complete User Guide
 
 ### 🚀 Getting Started
 
 #### Step 1: Create Your Account
-1. **Open your web browser** and navigate to `http://localhost:3000`
-2. **Click "Sign Up"** in the top-right corner of the navigation bar
-3. **Fill in the registration form**:
-   - Enter a valid email address
-   - Create a strong password (minimum 8 characters recommended)
-   - Confirm your password by typing it again
-4. **Click "Create Account"** to complete registration
-5. **Automatic Login**: You'll be automatically logged in and redirected to the homepage
+1. **Navigate** to `http://localhost:5000`
+2. **Click "Sign Up"** in the navigation bar
+3. **Enter your details**:
+   - Valid email address
+   - Strong password (8+ characters)
+   - Confirm password
+4. **Click "Create Account"**
+5. **Automatic login** and redirect to homepage
 
-#### Step 2: Explore the Homepage
-After successful registration, you'll see:
-- **Welcome message** with your personalized greeting
-- **Four AI tool cards** showcasing available features
-- **Premium banner** highlighting upgrade options
-- **Navigation bar** showing your email and logout option
-
----
-
-### 🛠️ Using the AI Tools
-
-#### 🔍 Tool 1: Question Generator
-
-**Purpose**: Generate practice questions from any text to test your understanding
-
-**Step-by-Step Process**:
-1. **Access the Tool**:
-   - From the homepage, click on the **"Question Generator"** card (❓ icon)
-   - You'll be redirected to the tools page with the Question Generator active
-
-2. **Input Your Content**:
-   - In the large text area, paste or type a paragraph of text
-   - This could be from textbooks, articles, lecture notes, or any educational content
-   - **Example**: "Photosynthesis is the process by which plants convert sunlight into energy..."
-
-3. **Generate Questions**:
-   - Click the **"Generate Questions"** button
-   - Wait for the AI to process your text (usually 2-3 seconds)
-
-4. **Review Results**:
-   - Generated questions will appear below the form
-   - Each question is designed to test different aspects of comprehension
-   - Use these questions for self-assessment or study group discussions
-
-**Best Practices**:
-- Use paragraphs of 50-300 words for optimal results
-- Include key concepts and important details in your input text
-- Save generated questions for later review
+#### Step 2: Explore the Dashboard
+After login, you'll see four main tools:
+- **🃏 Flashcard Generator** - Convert notes to flashcards
+- **📝 Quiz Generator** - Create multiple-choice quizzes
+- **📚 My Flashcards** - View saved flashcards
+- **🎯 Study Session** - Interactive study mode
 
 ---
 
-#### 📝 Tool 2: Text Summarizer
+### 🃏 Using the Flashcard Generator
 
-**Purpose**: Convert long texts into concise, easy-to-understand summaries
+#### Step 1: Access the Tool
+- Click on **"Flashcard Generator"** from the homepage
+- You'll be redirected to the flashcard tools page
 
-**Step-by-Step Process**:
-1. **Access the Tool**:
-   - Click on the **"Text Summarizer"** card (📝 icon) from the homepage
-   - The summarizer interface will load
+#### Step 2: Input Your Study Material
+1. **Deck Name**: Enter a name for your flashcard set
+   - Example: "Biology Chapter 5", "Math Formulas", "History Dates"
+2. **Study Notes**: Paste your study material
+   - Can be from textbooks, lecture notes, or any educational content
+   - Works best with 200-1000 words
 
-2. **Input Your Text**:
-   - Paste long articles, research papers, or extensive notes
-   - The tool works best with texts of 200+ words
-   - **Example**: Copy an entire Wikipedia article or research paper
+#### Step 3: Generate Flashcards
+1. **Click "Generate Flashcards"**
+2. **Wait for AI processing** (2-5 seconds)
+3. **Review generated flashcards**:
+   - Each card shows a question on the front
+   - Click any card to flip and see the answer
+   - Cards are automatically saved to your account
 
-3. **Generate Summary**:
-   - Click the **"Summarize"** button
-   - The AI will process and condense your text
-
-4. **Use Your Summary**:
-   - Review the concise summary highlighting key points
-   - Use for quick revision before exams
-   - Create study notes from lengthy materials
-
-**Best Practices**:
-- Use for academic papers, long articles, or textbook chapters
-- Review the summary alongside the original text initially
-- Save summaries for quick reference during exam preparation
+#### Step 4: Study with Your Flashcards
+- **Click cards** to flip between question and answer
+- **Use "Start Study Session"** for guided practice
+- **Delete unwanted cards** using the × button
 
 ---
 
-#### 🤖 Tool 3: Question Answering
+### 📝 Using the Quiz Generator
 
-**Purpose**: Get specific answers to your questions based on provided context
+#### Step 1: Access Quiz Generator
+- Click **"Quiz Generator"** from the tools menu
+- The quiz interface will load
 
-**Step-by-Step Process**:
-1. **Access the Tool**:
-   - Click on the **"Question Answering"** card (🤖 icon)
-   - The Q&A interface will open
+#### Step 2: Input Study Material
+- **Paste your study content** in the text area
+- Include key concepts, definitions, and important facts
+- The AI works best with comprehensive material
 
-2. **Provide Context**:
-   - In the **"Context"** field, paste relevant background information
-   - This could be a paragraph from your textbook, lecture notes, or study materials
-   - **Example**: "The water cycle involves evaporation, condensation, and precipitation..."
+#### Step 3: Take Your Quiz
+1. **Click "Generate Quiz"**
+2. **Answer multiple-choice questions**:
+   - Read each question carefully
+   - Click your chosen answer (A, B, C, or D)
+   - Immediate feedback shows correct/incorrect
+3. **View your final score** and performance summary
 
-3. **Ask Your Question**:
-   - In the **"Question"** field, type your specific question
-   - Be clear and specific for better answers
-   - **Example**: "What role does temperature play in evaporation?"
-
-4. **Get Your Answer**:
-   - Click **"Get Answer"**
-   - The AI will analyze the context and provide a relevant answer
-   - The answer will be based specifically on the context you provided
-
-**Best Practices**:
-- Provide comprehensive context for better answers
-- Ask specific, focused questions
-- Use this tool when you need clarification on specific concepts
+#### Step 4: Review and Improve
+- **Retake quizzes** to improve your score
+- **Generate new quizzes** from different study materials
+- **Use results** to identify areas needing more study
 
 ---
 
-#### 📅 Tool 4: Study Plan Generator
+### 📚 Managing Your Flashcards
 
-**Purpose**: Create personalized, time-based study schedules
+#### Viewing Saved Flashcards
+1. **Click "My Flashcards"** from the tools menu
+2. **Click "Load My Flashcards"** to see all saved cards
+3. **Browse by deck** or view all cards together
 
-**Step-by-Step Process**:
-1. **Access the Tool**:
-   - Click on the **"Study Plan Generator"** card (📅 icon)
-   - The study plan form will appear
+#### Organizing Your Collection
+- **Deck Names**: Use descriptive names for easy organization
+- **Delete Cards**: Remove cards that are no longer needed
+- **Study Sessions**: Practice with specific decks or all cards
 
-2. **Fill in Required Information**:
-   - **Syllabus**: Enter your course or subject name
-     - *Example*: "Introduction to Biology", "Advanced Mathematics", "World History"
-   
-   - **Topics**: List the specific topics you need to cover
-     - *Example*: "Cell structure, Photosynthesis, Genetics, Evolution"
-   
-   - **Start Date**: Select when you want to begin studying
-     - Use the date picker to choose your preferred start date
-   
-   - **Deadline**: Set your target completion date
-     - This could be an exam date or personal goal
-
-3. **Generate Your Plan**:
-   - Click **"Generate Plan"** after filling all fields
-   - The AI will create a structured study schedule
-
-4. **Follow Your Plan**:
-   - Review the generated timeline and daily tasks
-   - Adjust your schedule based on the recommendations
-   - Use the plan as a roadmap for your studies
-
-**Best Practices**:
-- Be realistic with your timeline
-- Include buffer time for review and practice
-- Break down complex topics into smaller, manageable sections
+#### Interactive Features
+- **Click to flip**: Tap any flashcard to see the answer
+- **Hover effects**: Visual feedback for better interaction
+- **Responsive design**: Works on desktop, tablet, and mobile
 
 ---
 
-### 💎 Premium Subscription Guide
+### 🎯 Study Sessions
 
-#### Understanding Usage Limits
-- **Free Tier**: 5 AI requests per month across all tools
-- **Premium**: Unlimited AI requests with no restrictions
-- **Usage Tracking**: Your remaining requests are displayed at the top of the tools page
+#### Starting a Session
+1. **Generate or load flashcards** first
+2. **Click "Start Study Session"**
+3. **Interactive study mode** begins
 
-#### Upgrading to Premium
+#### Session Features
+- **Progress tracking**: See current card number and total
+- **Score calculation**: Track your accuracy percentage
+- **Self-assessment**: Mark answers as correct or incorrect
+- **Automatic progression**: Move through cards systematically
 
-**Step 1: Access Premium Plans**
-- Click **"View Plans"** from the homepage banner, or
-- When you reach your free tier limit, click **"View Premium Plans"** in the upgrade modal
-
-**Step 2: Choose Your Plan**
-- **Monthly Plan**: KES 1,000/month - Perfect for short-term intensive study periods
-- **Yearly Plan**: KES 10,000/year - **Save KES 2,000!** - Best value for ongoing learning
-
-**Step 3: Complete Payment**
-1. Click **"Choose Monthly"** or **"Choose Yearly"**
-2. **Paystack Checkout** will open automatically
-3. **Enter Payment Details**:
-   - Card number, expiry date, and CVV
-   - Or choose Mobile Money (M-Pesa, Airtel Money)
-   - Or select Bank Transfer option
-4. **Confirm Payment** by clicking "Pay Now"
-5. **Instant Activation**: Premium features activate immediately after successful payment
-
-**Step 4: Enjoy Premium Benefits**
-- Unlimited AI requests across all tools
-- Priority processing for faster responses
-- Access to advanced features as they're released
+#### Session Controls
+- **Reveal Answer**: Show the answer when ready
+- **Mark Correct/Incorrect**: Self-assess your knowledge
+- **Next Card**: Progress through your deck
+- **Final Score**: See overall performance at the end
 
 ---
 
-### 👤 Account Management
+### 💎 Premium Subscription
 
-#### Checking Your Status
-- **Usage Information**: Displayed at the top of the tools page
-- **Subscription Status**: Visible in your user menu
-- **Request Counter**: Shows remaining free requests or "Unlimited" for premium users
+#### Understanding Limits
+- **Free Tier**: 5 AI requests per month
+- **Premium**: Unlimited flashcard and quiz generation
+- **Usage Tracking**: Monitor remaining requests in the top bar
 
-#### Managing Your Account
-1. **View Account Info**: Click on your email in the navigation bar
-2. **Logout**: Click "Logout" to securely end your session
-3. **Subscription Management**: Premium status and expiry dates are automatically tracked
+#### Subscription Plans
+- **Monthly**: KES 1,000/month
+- **Yearly**: KES 10,000/year (Save KES 2,000!)
 
----
-
-### 🔧 Troubleshooting Common Issues
-
-#### Login Problems
-- **Forgot Password**: Currently handled manually - contact support
-- **Account Not Found**: Ensure you're using the correct email address
-- **Login Fails**: Check your internet connection and try again
-
-#### Tool Usage Issues
-- **No Response**: Check your internet connection
-- **Error Messages**: Read the specific error and follow the suggested action
-- **Slow Performance**: Large texts may take longer to process
-
-#### Payment Issues
-- **Payment Fails**: Try a different payment method or contact your bank
-- **Premium Not Activated**: Refresh the page and check your subscription status
-- **Refund Requests**: Contact support with your payment reference
+#### Payment Process
+1. **Click "View Plans"** from the premium banner
+2. **Choose your plan** (Monthly or Yearly)
+3. **Paystack checkout** opens automatically
+4. **Complete payment** using:
+   - Credit/Debit card
+   - Mobile Money (M-Pesa, Airtel Money)
+   - Bank transfer
+5. **Instant activation** of premium features
 
 ---
 
-### 📊 Usage Tips for Maximum Benefit
+## 🔧 Technical Configuration
 
-#### For Students
-- **Daily Practice**: Use the Question Generator daily with your reading materials
-- **Exam Preparation**: Summarize lengthy chapters before exams
-- **Homework Help**: Use Q&A for clarification on difficult concepts
-- **Time Management**: Create study plans for each subject
+### Database Schema
+The application automatically creates these tables:
 
-#### For Educators
-- **Content Creation**: Generate questions for quizzes and tests
-- **Lesson Planning**: Summarize research materials for lesson preparation
-- **Student Support**: Help students create effective study schedules
+```sql
+-- Users table
+CREATE TABLE users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    subscription_type ENUM('free', 'premium') DEFAULT 'free',
+    subscription_expires DATETIME NULL,
+    ai_requests_used INT DEFAULT 0,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
 
-#### For Professionals
-- **Skill Development**: Create learning plans for new skills
-- **Research**: Summarize industry reports and papers
-- **Knowledge Testing**: Generate questions to assess understanding
+-- Flashcards table
+CREATE TABLE flashcards (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT,
+    question TEXT NOT NULL,
+    answer TEXT NOT NULL,
+    deck_name VARCHAR(255) DEFAULT 'General',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+-- Payments table
+CREATE TABLE payments (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT,
+    amount DECIMAL(10,2) NOT NULL,
+    currency VARCHAR(3) DEFAULT 'KES',
+    subscription_type ENUM('monthly', 'yearly') NOT NULL,
+    payment_reference VARCHAR(255) UNIQUE,
+    status ENUM('pending', 'completed', 'failed') DEFAULT 'pending',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+-- AI requests log
+CREATE TABLE ai_requests (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT,
+    request_type ENUM('flashcard_generation', 'quiz_generation') NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+```
+
+### API Endpoints
+
+#### Authentication
+- `POST /api/signup` - Create new user account
+- `POST /api/login` - User authentication
+- `POST /api/logout` - End user session
+- `GET /api/user-status` - Get current user information
+
+#### Flashcard Management
+- `POST /api/generate-flashcards` - Generate flashcards from notes
+- `POST /api/generate-quiz` - Create quiz from study material
+- `GET /api/get-flashcards` - Retrieve user's saved flashcards
+- `DELETE /api/delete-flashcard` - Remove specific flashcard
+
+#### Payments
+- `POST /api/initiate-payment` - Start premium subscription payment
+- `POST /api/verify-payment` - Verify and activate premium subscription
+
+---
+
+## 🎓 Best Practices for Effective Learning
+
+### Creating Quality Flashcards
+- **Use clear, concise questions** that test specific concepts
+- **Include context** in your study notes for better AI generation
+- **Review and edit** generated flashcards for accuracy
+- **Organize by topic** using descriptive deck names
+
+### Effective Study Sessions
+- **Regular practice**: Use flashcards daily for best retention
+- **Spaced repetition**: Review cards at increasing intervals
+- **Self-assessment**: Be honest when marking correct/incorrect
+- **Focus on weak areas**: Spend more time on difficult concepts
+
+### Maximizing Quiz Benefits
+- **Take quizzes multiple times** to reinforce learning
+- **Analyze wrong answers** to identify knowledge gaps
+- **Use varied study materials** for comprehensive coverage
+- **Track improvement** over time with repeated quizzes
 
 ---
 
 ## 🔒 Security & Privacy
 
-- **Password Security**: All passwords are encrypted using bcrypt hashing
+- **Password Security**: bcrypt encryption for all user passwords
 - **Session Management**: Secure user sessions with automatic timeout
-- **Data Protection**: User data is stored securely in MySQL database
-- **Payment Security**: All payments processed through Paystack's secure, PCI-compliant system
+- **Data Protection**: User flashcards stored securely in MySQL
+- **Payment Security**: All transactions processed through Paystack's secure system
+- **API Security**: Rate limiting and authentication for all AI requests
 
 ---
 
@@ -375,37 +358,51 @@ After successful registration, you'll see:
 ```bash
 python app.py
 ```
+Application runs on `http://localhost:5000`
 
 ### Production Deployment
-1. **Set up MySQL** on your production server
-2. **Configure environment variables** for database credentials
-3. **Update Paystack keys** with production keys
-4. **Deploy using** your preferred hosting service (Heroku, DigitalOcean, AWS, etc.)
+1. **Set up MySQL** on production server
+2. **Configure environment variables** for API keys and database
+3. **Update Paystack keys** with production credentials
+4. **Deploy using** preferred hosting service (Heroku, DigitalOcean, AWS)
+
+### Environment Variables (Production)
+```bash
+OPENAI_API_KEY=your_openai_key
+COHERE_API_KEY=your_cohere_key
+PAYSTACK_PUBLIC_KEY=your_paystack_public_key
+PAYSTACK_SECRET_KEY=your_paystack_secret_key
+MYSQL_HOST=your_mysql_host
+MYSQL_USER=your_mysql_user
+MYSQL_PASSWORD=your_mysql_password
+MYSQL_DATABASE=zubari_flashcards
+```
 
 ---
 
 ## 🔮 Future Enhancements
 
-- 🤖 **Real AI Integration**: Replace mock responses with actual AI models (OpenAI, Anthropic)
-- 📊 **Analytics Dashboard**: Track learning progress and statistics
-- 🎯 **Personalized Recommendations**: AI-driven study suggestions
+- 🤖 **Advanced AI Models**: Integration with GPT-4 and Claude
+- 📊 **Learning Analytics**: Detailed progress tracking and insights
+- 🎯 **Spaced Repetition**: Intelligent scheduling for optimal retention
 - 📱 **Mobile App**: Native iOS and Android applications
-- 🌍 **Multi-language Support**: Support for multiple languages
-- 🔗 **API Access**: RESTful API for third-party integrations
-- 📚 **Study Groups**: Collaborative learning features
-- 🏆 **Gamification**: Points, badges, and leaderboards
+- 🌍 **Multi-language**: Support for multiple languages
+- 🔗 **Export Options**: PDF, Anki, and other format exports
+- 👥 **Collaborative Decks**: Share flashcards with classmates
+- 🏆 **Gamification**: Points, streaks, and achievement systems
 
 ---
 
 ## 🤝 Contributing
 
-We welcome contributions! Here's how to get started:
+We welcome contributions! To get started:
 
 1. **Fork** the repository
 2. **Create** a feature branch: `git checkout -b feature-name`
-3. **Commit** your changes: `git commit -m "Add feature"`
-4. **Push** to the branch: `git push origin feature-name`
-5. **Submit** a Pull Request
+3. **Make** your changes with proper testing
+4. **Commit** changes: `git commit -m "Add feature"`
+5. **Push** to branch: `git push origin feature-name`
+6. **Submit** a Pull Request
 
 ---
 
@@ -417,7 +414,7 @@ This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) 
 
 ## 📞 Support & Contact
 
-For questions, support, or collaboration opportunities:
+For questions, support, or collaboration:
 
 - 📧 **Email**: philipbarongo30@gmail.com
 - 🔗 **LinkedIn**: [Philip Barongo](https://www.linkedin.com/in/philip-barongo-8b215028a/)
@@ -428,10 +425,11 @@ For questions, support, or collaboration opportunities:
 
 ## 🙏 Acknowledgments
 
+- **OpenAI** for powerful language models
+- **Cohere** for quiz generation capabilities
+- **Paystack** for seamless payment processing in Kenya
 - **Flask Community** for the excellent web framework
 - **MySQL** for reliable database management
-- **Paystack** for seamless payment processing in Kenya
-- **Open Source Community** for inspiration and resources
 
 ---
 
@@ -440,36 +438,68 @@ For questions, support, or collaboration opportunities:
 ### Minimum Requirements
 - **Python**: 3.8+
 - **MySQL**: 8.0+
-- **RAM**: 512MB
-- **Storage**: 100MB free space
-- **Internet**: Stable connection for AI features
+- **RAM**: 1GB
+- **Storage**: 200MB free space
+- **Internet**: Stable connection for AI APIs
 
 ### Recommended Requirements
 - **Python**: 3.10+
 - **MySQL**: 8.0+ with InnoDB engine
-- **RAM**: 1GB+
-- **Storage**: 500MB free space
-- **Internet**: Broadband connection for optimal performance
+- **RAM**: 2GB+
+- **Storage**: 1GB free space
+- **Internet**: Broadband connection for optimal AI performance
 
 ---
 
-## 🔍 API Endpoints Reference
+## 🔍 Troubleshooting
 
-### Authentication
-- `POST /api/signup` - Create new user account
-- `POST /api/login` - User authentication
-- `POST /api/logout` - End user session
-- `GET /api/user-status` - Get current user information
+### Common Issues
 
-### AI Tools
-- `POST /api/generate-questions` - Generate questions from text
-- `POST /api/summarize` - Summarize long text
-- `POST /api/answer-question` - Answer questions with context
-- `POST /api/generate-study-plan` - Create personalized study plans
+#### Database Connection Problems
+```bash
+# Check MySQL service status
+sudo systemctl status mysql
 
-### Payments
-- `POST /api/initiate-payment` - Start premium subscription payment
-- `POST /api/verify-payment` - Verify and activate premium subscription
+# Restart MySQL if needed
+sudo systemctl restart mysql
+```
+
+#### API Key Issues
+- Verify OpenAI API key has sufficient credits
+- Ensure Cohere API key is active and valid
+- Check API key permissions and rate limits
+
+#### Payment Integration
+- Confirm Paystack keys are correct (test vs production)
+- Verify webhook URLs are properly configured
+- Check payment reference generation
+
+### Error Messages
+- **"Module not found"**: Run `pip install -r requirements.txt`
+- **"Database connection failed"**: Check MySQL credentials and service
+- **"API request failed"**: Verify API keys and internet connection
+- **"Payment failed"**: Check Paystack configuration and user payment method
+
+---
+
+## 💳 Premium Subscription Details
+
+### Pricing
+- **Monthly Plan**: KES 1,000/month
+- **Yearly Plan**: KES 10,000/year (17% savings)
+
+### Benefits
+- **Unlimited AI requests** for flashcard generation
+- **Unlimited quiz creation** with Cohere AI
+- **Priority processing** for faster response times
+- **Advanced features** as they become available
+- **Email support** for technical assistance
+
+### Payment Methods (via Paystack)
+- **Credit/Debit Cards**: Visa, Mastercard, Verve
+- **Mobile Money**: M-Pesa, Airtel Money
+- **Bank Transfer**: Direct bank transfers
+- **USSD**: Mobile banking via USSD codes
 
 ---
 

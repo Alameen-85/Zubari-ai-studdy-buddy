@@ -1,6 +1,10 @@
 // Global state
 let currentUser = null;
 let currentTool = null;
+let flashcards = [];
+let currentCardIndex = 0;
+let sessionScore = 0;
+let correctAnswers = 0;
 
 // Initialize app
 document.addEventListener('DOMContentLoaded', function() {
@@ -112,26 +116,58 @@ function initializeEventListeners() {
         signupForm.addEventListener('submit', handleSignup);
     }
 
-    // Tool forms
-    const questionForm = document.getElementById('questionForm');
-    const summarizerForm = document.getElementById('summarizerForm');
-    const qaForm = document.getElementById('qaForm');
-    const studyPlanForm = document.getElementById('studyPlanForm');
+    // Flashcard forms
+    const flashcardForm = document.getElementById('flashcardForm');
+    const quizForm = document.getElementById('quizForm');
+    const loadFlashcards = document.getElementById('loadFlashcards');
+    const startSession = document.getElementById('startSession');
 
-    if (questionForm) {
-        questionForm.addEventListener('submit', handleQuestionGeneration);
+    if (flashcardForm) {
+        flashcardForm.addEventListener('submit', handleFlashcardGeneration);
     }
 
-    if (summarizerForm) {
-        summarizerForm.addEventListener('submit', handleSummarization);
+    if (quizForm) {
+        quizForm.addEventListener('submit', handleQuizGeneration);
     }
 
-    if (qaForm) {
-        qaForm.addEventListener('submit', handleQuestionAnswering);
+    if (loadFlashcards) {
+        loadFlashcards.addEventListener('click', loadUserFlashcards);
     }
 
-    if (studyPlanForm) {
-        studyPlanForm.addEventListener('submit', handleStudyPlanGeneration);
+    if (startSession) {
+        startSession.addEventListener('click', startStudySession);
+    }
+
+    // Study session controls
+    const revealAnswer = document.getElementById('revealAnswer');
+    const nextCard = document.getElementById('nextCard');
+    const markCorrect = document.getElementById('markCorrect');
+    const markIncorrect = document.getElementById('markIncorrect');
+
+    if (revealAnswer) {
+        revealAnswer.addEventListener('click', () => {
+            document.getElementById('cardAnswer').classList.remove('hidden');
+            revealAnswer.classList.add('hidden');
+            document.getElementById('markCorrect').classList.remove('hidden');
+            document.getElementById('markIncorrect').classList.remove('hidden');
+        });
+    }
+
+    if (markCorrect) {
+        markCorrect.addEventListener('click', () => {
+            correctAnswers++;
+            nextCardInSession();
+        });
+    }
+
+    if (markIncorrect) {
+        markIncorrect.addEventListener('click', () => {
+            nextCardInSession();
+        });
+    }
+
+    if (nextCard) {
+        nextCard.addEventListener('click', nextCardInSession);
     }
 
     // Premium plan buttons
@@ -178,7 +214,7 @@ function navigateToTool(tool) {
         return;
     }
     
-    window.location.href = `/tools.html?tool=${tool}`;
+    window.location.href = `/flashcards.html?tool=${tool}`;
 }
 
 function showTool(tool) {
@@ -196,12 +232,12 @@ function showTool(tool) {
         const toolTitle = document.getElementById('toolTitle');
         if (toolTitle) {
             const titles = {
-                'question-generator': 'Question Generator',
-                'summarizer': 'Text Summarizer',
-                'qa': 'Question Answering',
-                'study-plan': 'Study Plan Generator'
+                'flashcard-generator': 'Flashcard Generator',
+                'quiz-generator': 'Quiz Generator',
+                'my-flashcards': 'My Flashcards',
+                'study-session': 'Study Session'
             };
-            toolTitle.textContent = titles[tool] || 'AI Study Tools';
+            toolTitle.textContent = titles[tool] || 'Flashcard Tools';
         }
     }
 }
@@ -277,27 +313,28 @@ async function logout() {
     }
 }
 
-// AI tool handlers
-async function handleQuestionGeneration(e) {
+// Flashcard handlers
+async function handleFlashcardGeneration(e) {
     e.preventDefault();
     
-    const paragraph = document.getElementById('paragraph').value;
-    const resultsDiv = document.getElementById('questionResults');
+    const notes = document.getElementById('notes').value;
+    const deckName = document.getElementById('deckName').value;
+    const resultsDiv = document.getElementById('flashcardResults');
     
-    if (!paragraph.trim()) {
-        showError('Please enter a paragraph');
+    if (!notes.trim()) {
+        showError('Please enter study notes');
         return;
     }
     
     try {
         setLoading(e.target, true);
         
-        const response = await fetch('/api/generate-questions', {
+        const response = await fetch('/api/generate-flashcards', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ paragraph })
+            body: JSON.stringify({ notes, deckName })
         });
         
         const data = await response.json();
@@ -312,36 +349,36 @@ async function handleQuestionGeneration(e) {
             return;
         }
         
-        displayQuestions(data.questions, resultsDiv);
+        displayFlashcards(data.flashcards, resultsDiv);
         await checkAuthStatus(); // Update usage info
         
     } catch (error) {
-        showError('Failed to generate questions. Please try again.');
+        showError('Failed to generate flashcards. Please try again.');
     } finally {
         setLoading(e.target, false);
     }
 }
 
-async function handleSummarization(e) {
+async function handleQuizGeneration(e) {
     e.preventDefault();
     
-    const text = document.getElementById('textToSummarize').value;
-    const resultsDiv = document.getElementById('summaryResults');
+    const notes = document.getElementById('quizNotes').value;
+    const resultsDiv = document.getElementById('quizResults');
     
-    if (!text.trim()) {
-        showError('Please enter text to summarize');
+    if (!notes.trim()) {
+        showError('Please enter study material');
         return;
     }
     
     try {
         setLoading(e.target, true);
         
-        const response = await fetch('/api/summarize', {
+        const response = await fetch('/api/generate-quiz', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ text })
+            body: JSON.stringify({ notes })
         });
         
         const data = await response.json();
@@ -356,141 +393,281 @@ async function handleSummarization(e) {
             return;
         }
         
-        displaySummary(data.summary, resultsDiv);
+        displayQuiz(data.quiz, resultsDiv);
         await checkAuthStatus(); // Update usage info
         
     } catch (error) {
-        showError('Failed to summarize text. Please try again.');
+        showError('Failed to generate quiz. Please try again.');
     } finally {
         setLoading(e.target, false);
     }
 }
 
-async function handleQuestionAnswering(e) {
-    e.preventDefault();
-    
-    const context = document.getElementById('context').value;
-    const question = document.getElementById('question').value;
-    const resultsDiv = document.getElementById('qaResults');
-    
-    if (!context.trim() || !question.trim()) {
-        showError('Please provide both context and question');
-        return;
-    }
-    
+async function loadUserFlashcards() {
     try {
-        setLoading(e.target, true);
-        
-        const response = await fetch('/api/answer-question', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ context, question })
-        });
-        
+        const response = await fetch('/api/get-flashcards');
         const data = await response.json();
-        
-        if (data.requiresUpgrade) {
-            showUpgradeModal();
-            return;
-        }
         
         if (data.error) {
             showError(data.error);
             return;
         }
         
-        displayAnswer(data.answer, resultsDiv);
-        await checkAuthStatus(); // Update usage info
+        displaySavedFlashcards(data.flashcards);
         
     } catch (error) {
-        showError('Failed to answer question. Please try again.');
-    } finally {
-        setLoading(e.target, false);
+        showError('Failed to load flashcards. Please try again.');
     }
 }
 
-async function handleStudyPlanGeneration(e) {
-    e.preventDefault();
-    
-    const syllabus = document.getElementById('syllabus').value;
-    const topics = document.getElementById('topics').value;
-    const startDate = document.getElementById('startDate').value;
-    const deadline = document.getElementById('deadline').value;
-    const resultsDiv = document.getElementById('studyPlanResults');
-    
-    if (!syllabus.trim() || !topics.trim() || !startDate || !deadline) {
-        showError('Please fill in all fields');
-        return;
-    }
-    
+async function deleteFlashcard(id) {
     try {
-        setLoading(e.target, true);
-        
-        const response = await fetch('/api/generate-study-plan', {
-            method: 'POST',
+        const response = await fetch('/api/delete-flashcard', {
+            method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ syllabus, topics, startDate, deadline })
+            body: JSON.stringify({ id })
         });
         
         const data = await response.json();
         
-        if (data.requiresUpgrade) {
-            showUpgradeModal();
-            return;
+        if (data.success) {
+            loadUserFlashcards(); // Reload flashcards
+        } else {
+            showError('Failed to delete flashcard');
         }
-        
-        if (data.error) {
-            showError(data.error);
-            return;
-        }
-        
-        displayStudyPlan(data.studyPlan, resultsDiv);
-        await checkAuthStatus(); // Update usage info
         
     } catch (error) {
-        showError('Failed to generate study plan. Please try again.');
-    } finally {
-        setLoading(e.target, false);
+        showError('Failed to delete flashcard. Please try again.');
     }
+}
+
+// Study session functions
+function startStudySession() {
+    if (flashcards.length === 0) {
+        showError('No flashcards available. Generate some flashcards first!');
+        return;
+    }
+    
+    currentCardIndex = 0;
+    correctAnswers = 0;
+    sessionScore = 0;
+    
+    document.getElementById('sessionStats').classList.remove('hidden');
+    document.getElementById('studyCard').classList.remove('hidden');
+    
+    updateSessionStats();
+    showCurrentCard();
+}
+
+function showCurrentCard() {
+    if (currentCardIndex >= flashcards.length) {
+        endStudySession();
+        return;
+    }
+    
+    const card = flashcards[currentCardIndex];
+    document.getElementById('cardQuestion').textContent = card.question;
+    document.getElementById('cardAnswer').textContent = card.answer;
+    
+    // Reset card state
+    document.getElementById('cardAnswer').classList.add('hidden');
+    document.getElementById('revealAnswer').classList.remove('hidden');
+    document.getElementById('markCorrect').classList.add('hidden');
+    document.getElementById('markIncorrect').classList.add('hidden');
+    document.getElementById('nextCard').classList.add('hidden');
+}
+
+function nextCardInSession() {
+    currentCardIndex++;
+    updateSessionStats();
+    showCurrentCard();
+}
+
+function updateSessionStats() {
+    document.getElementById('currentCard').textContent = currentCardIndex + 1;
+    document.getElementById('totalCards').textContent = flashcards.length;
+    
+    if (flashcards.length > 0) {
+        sessionScore = Math.round((correctAnswers / Math.max(currentCardIndex, 1)) * 100);
+        document.getElementById('score').textContent = sessionScore;
+    }
+}
+
+function endStudySession() {
+    const finalScore = Math.round((correctAnswers / flashcards.length) * 100);
+    showSuccess(`Study session completed! Final score: ${finalScore}% (${correctAnswers}/${flashcards.length})`);
+    
+    document.getElementById('studyCard').classList.add('hidden');
+    document.getElementById('sessionStats').classList.add('hidden');
 }
 
 // Display functions
-function displayQuestions(questions, container) {
+function displayFlashcards(flashcardData, container) {
+    flashcards = flashcardData; // Store for study session
+    
     container.innerHTML = `
-        <h3>Generated Questions</h3>
-        <ul class="questions-list">
-            ${questions.map(q => `<li>${q}</li>`).join('')}
-        </ul>
+        <h3>Generated Flashcards</h3>
+        <div class="flashcard-deck">
+            ${flashcardData.map((card, index) => `
+                <div class="flashcard" data-index="${index}">
+                    <div class="flashcard-inner">
+                        <div class="flashcard-front">
+                            <div class="card-label">Question</div>
+                            <div class="card-text">${card.question}</div>
+                        </div>
+                        <div class="flashcard-back">
+                            <div class="card-label">Answer</div>
+                            <div class="card-text">${card.answer}</div>
+                        </div>
+                    </div>
+                </div>
+            `).join('')}
+        </div>
+        <div class="flashcard-actions">
+            <button onclick="startStudySession()" class="action-btn">Start Study Session</button>
+        </div>
     `;
     container.classList.remove('hidden');
+    
+    // Add hover effects to flashcards
+    addFlashcardInteractivity();
 }
 
-function displaySummary(summary, container) {
-    container.innerHTML = `
-        <h3>Summary</h3>
-        <div class="summary-text">${summary}</div>
-    `;
+function displaySavedFlashcards(flashcardData) {
+    flashcards = flashcardData; // Store for study session
+    const container = document.getElementById('savedFlashcards');
+    
+    if (flashcardData.length === 0) {
+        container.innerHTML = `
+            <div class="empty-state">
+                <h3>No flashcards yet</h3>
+                <p>Generate your first set of flashcards to get started!</p>
+                <button onclick="navigateToTool('flashcard-generator')" class="action-btn">Generate Flashcards</button>
+            </div>
+        `;
+    } else {
+        container.innerHTML = `
+            <h3>Your Flashcards (${flashcardData.length} cards)</h3>
+            <div class="flashcard-deck">
+                ${flashcardData.map((card, index) => `
+                    <div class="flashcard" data-index="${index}">
+                        <div class="flashcard-inner">
+                            <div class="flashcard-front">
+                                <div class="card-label">Question</div>
+                                <div class="card-text">${card.question}</div>
+                                <button class="delete-btn" onclick="deleteFlashcard(${card.id})">×</button>
+                            </div>
+                            <div class="flashcard-back">
+                                <div class="card-label">Answer</div>
+                                <div class="card-text">${card.answer}</div>
+                                <button class="delete-btn" onclick="deleteFlashcard(${card.id})">×</button>
+                            </div>
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+            <div class="flashcard-actions">
+                <button onclick="startStudySession()" class="action-btn">Start Study Session</button>
+            </div>
+        `;
+    }
+    
     container.classList.remove('hidden');
+    addFlashcardInteractivity();
 }
 
-function displayAnswer(answer, container) {
-    container.innerHTML = `
-        <h3>Answer</h3>
-        <div class="answer-text">${answer}</div>
-    `;
+function displayQuiz(quizData, container) {
+    let currentQuestion = 0;
+    let quizScore = 0;
+    
+    function showQuestion() {
+        const question = quizData[currentQuestion];
+        container.innerHTML = `
+            <h3>Quiz Question ${currentQuestion + 1}/${quizData.length}</h3>
+            <div class="quiz-question">
+                <h4>${question.question}</h4>
+                <div class="quiz-options">
+                    ${question.options.map((option, index) => `
+                        <button class="quiz-option" data-index="${index}">${String.fromCharCode(65 + index)}. ${option}</button>
+                    `).join('')}
+                </div>
+                <div class="quiz-feedback hidden" id="quizFeedback"></div>
+                <button id="nextQuestion" class="action-btn hidden">Next Question</button>
+            </div>
+        `;
+        
+        // Add option click handlers
+        const options = container.querySelectorAll('.quiz-option');
+        options.forEach(option => {
+            option.addEventListener('click', (e) => {
+                const selectedIndex = parseInt(e.target.getAttribute('data-index'));
+                const isCorrect = selectedIndex === question.correct;
+                
+                if (isCorrect) {
+                    quizScore++;
+                    e.target.classList.add('correct');
+                } else {
+                    e.target.classList.add('incorrect');
+                    options[question.correct].classList.add('correct');
+                }
+                
+                options.forEach(opt => opt.disabled = true);
+                
+                const feedback = document.getElementById('quizFeedback');
+                feedback.textContent = isCorrect ? 'Correct!' : 'Incorrect. The correct answer is highlighted.';
+                feedback.classList.remove('hidden');
+                
+                if (currentQuestion < quizData.length - 1) {
+                    document.getElementById('nextQuestion').classList.remove('hidden');
+                } else {
+                    setTimeout(() => {
+                        showQuizResults();
+                    }, 2000);
+                }
+            });
+        });
+        
+        const nextBtn = document.getElementById('nextQuestion');
+        if (nextBtn) {
+            nextBtn.addEventListener('click', () => {
+                currentQuestion++;
+                showQuestion();
+            });
+        }
+    }
+    
+    function showQuizResults() {
+        const percentage = Math.round((quizScore / quizData.length) * 100);
+        container.innerHTML = `
+            <h3>Quiz Complete!</h3>
+            <div class="quiz-results">
+                <div class="score-display">
+                    <div class="score-circle">
+                        <span class="score-number">${percentage}%</span>
+                    </div>
+                    <p>You scored ${quizScore} out of ${quizData.length} questions correctly!</p>
+                </div>
+                <div class="quiz-actions">
+                    <button onclick="handleQuizGeneration(event)" class="action-btn">Retake Quiz</button>
+                    <button onclick="navigateToTool('flashcard-generator')" class="action-btn secondary">Generate More Flashcards</button>
+                </div>
+            </div>
+        `;
+    }
+    
     container.classList.remove('hidden');
+    showQuestion();
 }
 
-function displayStudyPlan(studyPlan, container) {
-    container.innerHTML = `
-        <h3>Your Study Plan</h3>
-        <div class="study-plan-text">${studyPlan}</div>
-    `;
-    container.classList.remove('hidden');
+function addFlashcardInteractivity() {
+    const flashcards = document.querySelectorAll('.flashcard');
+    flashcards.forEach(card => {
+        card.addEventListener('click', () => {
+            card.classList.toggle('flipped');
+        });
+    });
 }
 
 // Payment functions

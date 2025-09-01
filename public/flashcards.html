@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flashcard Tools - Zubari AI Studdy Buddy</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <h2>🧠 Zubari AI Studdy Buddy</h2>
+            </div>
+            <div class="nav-auth">
+                <button id="loginBtn" class="auth-btn">Log In</button>
+                <button id="signupBtn" class="auth-btn primary">Sign Up</button>
+                <div id="userMenu" class="user-menu hidden">
+                    <span id="userEmail"></span>
+                    <button id="logoutBtn" class="auth-btn">Logout</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="tool-header">
+            <h1 id="toolTitle">Flashcard Tools</h1>
+            <div id="usageInfo" class="usage-info hidden">
+                <span id="requestsRemaining"></span>
+            </div>
+        </div>
+
+        <!-- Flashcard Generator -->
+        <div id="flashcard-generator" class="tool-section hidden">
+            <div class="form-container">
+                <h2>🃏 Generate Flashcards</h2>
+                <form id="flashcardForm">
+                    <div class="form-group">
+                        <label for="deckName">Deck Name:</label>
+                        <input type="text" id="deckName" name="deckName" placeholder="e.g., Biology Chapter 1" value="General">
+                    </div>
+                    <div class="form-group">
+                        <label for="notes">Study Notes:</label>
+                        <textarea id="notes" name="notes" placeholder="Paste your study notes here..." required></textarea>
+                    </div>
+                    <button type="submit" class="submit-btn">Generate Flashcards</button>
+                </form>
+                <div id="flashcardResults" class="results-section hidden"></div>
+            </div>
+        </div>
+
+        <!-- Quiz Generator -->
+        <div id="quiz-generator" class="tool-section hidden">
+            <div class="form-container">
+                <h2>📝 Generate Quiz</h2>
+                <form id="quizForm">
+                    <div class="form-group">
+                        <label for="quizNotes">Study Material:</label>
+                        <textarea id="quizNotes" name="notes" placeholder="Enter study material for quiz generation..." required></textarea>
+                    </div>
+                    <button type="submit" class="submit-btn">Generate Quiz</button>
+                </form>
+                <div id="quizResults" class="results-section hidden"></div>
+            </div>
+        </div>
+
+        <!-- My Flashcards -->
+        <div id="my-flashcards" class="tool-section hidden">
+            <div class="form-container">
+                <h2>📚 My Flashcards</h2>
+                <div class="flashcard-controls">
+                    <button id="loadFlashcards" class="submit-btn">Load My Flashcards</button>
+                </div>
+                <div id="savedFlashcards" class="flashcard-deck hidden"></div>
+            </div>
+        </div>
+
+        <!-- Study Session -->
+        <div id="study-session" class="tool-section hidden">
+            <div class="form-container">
+                <h2>🎯 Study Session</h2>
+                <div class="session-controls">
+                    <button id="startSession" class="submit-btn">Start Study Session</button>
+                    <div id="sessionStats" class="session-stats hidden">
+                        <span>Progress: <span id="currentCard">0</span>/<span id="totalCards">0</span></span>
+                        <span>Score: <span id="score">0</span>%</span>
+                    </div>
+                </div>
+                <div id="studyCard" class="study-card hidden">
+                    <div class="card-content">
+                        <div class="card-question" id="cardQuestion"></div>
+                        <div class="card-answer hidden" id="cardAnswer"></div>
+                    </div>
+                    <div class="card-controls">
+                        <button id="revealAnswer" class="card-btn">Reveal Answer</button>
+                        <button id="nextCard" class="card-btn hidden">Next Card</button>
+                        <button id="markCorrect" class="card-btn success hidden">Correct</button>
+                        <button id="markIncorrect" class="card-btn error hidden">Incorrect</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="back-link">
+            <a href="/" id="backToHome">← Back to Home</a>
+        </div>
+    </div>
+
+    <!-- Upgrade Modal -->
+    <div id="upgradeModal" class="modal hidden">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Upgrade Required</h2>
+            <p>You've reached your free tier limit of 5 AI requests per month.</p>
+            <p>Upgrade to Premium for unlimited flashcard generation!</p>
+            <button onclick="window.location.href='/premium.html'" class="premium-btn">View Premium Plans</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

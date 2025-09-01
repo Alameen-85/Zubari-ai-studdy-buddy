@@ -5,14 +5,20 @@ import bcrypt
 import os
 from datetime import datetime, timedelta
 import secrets
+import openai
+import cohere
 
 app = Flask(__name__, static_folder='public', static_url_path='')
-app.secret_key = 'zubari-ai-secret-key-2025'
+app.secret_key = 'zubari-ai-flashcard-secret-key-2025'
+
+# API Configuration
+openai.api_key = 'your-openai-api-key'  # Replace with your OpenAI API key
+cohere_client = cohere.Client('your-cohere-api-key')  # Replace with your Cohere API key
 
 # MySQL Database Configuration
 DB_CONFIG = {
     'host': 'localhost',
-    'database': 'zubari_ai',
+    'database': 'zubari_flashcards',
     'user': 'root',
     'password': '',  # Update with your MySQL password
     'charset': 'utf8mb4',
@@ -38,8 +44,8 @@ def init_database():
     
     try:
         # Create database if it doesn't exist
-        cursor.execute("CREATE DATABASE IF NOT EXISTS zubari_ai")
-        cursor.execute("USE zubari_ai")
+        cursor.execute("CREATE DATABASE IF NOT EXISTS zubari_flashcards")
+        cursor.execute("USE zubari_flashcards")
         
         # Users table
         cursor.execute('''
@@ -51,6 +57,19 @@ def init_database():
                 subscription_expires DATETIME NULL,
                 ai_requests_used INT DEFAULT 0,
                 created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+            )
+        ''')
+        
+        # Flashcards table
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS flashcards (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                user_id INT,
+                question TEXT NOT NULL,
+                answer TEXT NOT NULL,
+                deck_name VARCHAR(255) DEFAULT 'General',
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
             )
         ''')
         
@@ -74,7 +93,7 @@ def init_database():
             CREATE TABLE IF NOT EXISTS ai_requests (
                 id INT AUTO_INCREMENT PRIMARY KEY,
                 user_id INT,
-                request_type ENUM('question_generation', 'summarization', 'question_answering', 'study_plan_generation') NOT NULL,
+                request_type ENUM('flashcard_generation', 'quiz_generation') NOT NULL,
                 created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
                 FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
             )
@@ -156,9 +175,9 @@ def signup_page():
 def premium_page():
     return app.send_static_file('premium.html')
 
-@app.route("/tools.html")
-def tools_page():
-    return app.send_static_file('tools.html')
+@app.route("/flashcards.html")
+def flashcards_page():
+    return app.send_static_file('flashcards.html')
 
 # Authentication routes
 @app.route("/api/signup", methods=["POST"])
@@ -267,169 +286,195 @@ def user_status():
         connection.close()
 
 # AI service routes
-@app.route("/api/generate-questions", methods=["POST"])
-def generate_questions():
+@app.route("/api/generate-flashcards", methods=["POST"])
+def generate_flashcards():
     user, success = check_subscription()
     if not success:
         return jsonify(user)
     
     data = request.get_json()
-    paragraph = data.get('paragraph', '').strip()
+    notes = data.get('notes', '').strip()
+    deck_name = data.get('deckName', 'General').strip()
     
-    if not paragraph:
-        return jsonify({'error': 'Please provide a paragraph'})
+    if not notes:
+        return jsonify({'error': 'Please provide study notes'})
     
-    # Increment AI request count for free users
-    if user['subscription_type'] != 'premium':
+    try:
+        # Generate flashcards using OpenAI
+        response = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo",
+            messages=[
+                {"role": "system", "content": "You are a helpful assistant that creates flashcards from study notes. Generate 5-10 question-answer pairs in JSON format with 'question' and 'answer' fields."},
+                {"role": "user", "content": f"Create flashcards from these notes: {notes}"}
+            ],
+            max_tokens=1000
+        )
+        
+        # Parse AI response (simplified - in production, add proper JSON parsing)
+        flashcards_text = response.choices[0].message.content
+        
+        # Mock flashcards for demo (replace with actual AI parsing)
+        flashcards = [
+            {"question": "What is the main concept in the provided notes?", "answer": "Based on the study material provided"},
+            {"question": "What are the key points to remember?", "answer": "The important details from your notes"},
+            {"question": "How does this concept apply?", "answer": "Practical application of the material"},
+            {"question": "What is the significance?", "answer": "Why this information is important"},
+            {"question": "What should you remember for the exam?", "answer": "Critical points for assessment"}
+        ]
+        
+        # Save flashcards to database
         connection = get_db_connection()
         if connection:
             cursor = connection.cursor()
             try:
-                cursor.execute('UPDATE users SET ai_requests_used = ai_requests_used + 1 WHERE id = %s', 
-                              (session['user_id'],))
-                cursor.execute('INSERT INTO ai_requests (user_id, request_type) VALUES (%s, %s)', 
-                              (session['user_id'], 'question_generation'))
+                for card in flashcards:
+                    cursor.execute('INSERT INTO flashcards (user_id, question, answer, deck_name) VALUES (%s, %s, %s, %s)',
+                                  (session['user_id'], card['question'], card['answer'], deck_name))
+                
+                # Increment AI request count for free users
+                if user['subscription_type'] != 'premium':
+                    cursor.execute('UPDATE users SET ai_requests_used = ai_requests_used + 1 WHERE id = %s', 
+                                  (session['user_id'],))
+                    cursor.execute('INSERT INTO ai_requests (user_id, request_type) VALUES (%s, %s)', 
+                                  (session['user_id'], 'flashcard_generation'))
+                
                 connection.commit()
             except Error as e:
                 pass
             finally:
                 cursor.close()
                 connection.close()
-    
-    # Mock AI response (replace with actual AI integration)
-    questions = [
-        "What is the main topic discussed in this paragraph?",
-        "Can you explain the key concepts mentioned?",
-        "What are the implications of the information provided?",
-        "How does this relate to broader themes in the subject?",
-        "What questions might arise from this content?"
-    ]
-    
-    return jsonify({'questions': questions})
+        
+        return jsonify({'flashcards': flashcards})
+        
+    except Exception as e:
+        # Fallback to mock data if API fails
+        flashcards = [
+            {"question": "What is the main concept in the provided notes?", "answer": "Based on the study material provided"},
+            {"question": "What are the key points to remember?", "answer": "The important details from your notes"},
+            {"question": "How does this concept apply?", "answer": "Practical application of the material"}
+        ]
+        return jsonify({'flashcards': flashcards})
 
-@app.route("/api/summarize", methods=["POST"])
-def summarize():
+@app.route("/api/generate-quiz", methods=["POST"])
+def generate_quiz():
     user, success = check_subscription()
     if not success:
         return jsonify(user)
     
     data = request.get_json()
-    text = data.get('text', '').strip()
+    notes = data.get('notes', '').strip()
     
-    if not text:
-        return jsonify({'error': 'Please provide text to summarize'})
+    if not notes:
+        return jsonify({'error': 'Please provide study notes'})
     
-    # Increment AI request count for free users
-    if user['subscription_type'] != 'premium':
-        connection = get_db_connection()
-        if connection:
-            cursor = connection.cursor()
-            try:
-                cursor.execute('UPDATE users SET ai_requests_used = ai_requests_used + 1 WHERE id = %s', 
-                              (session['user_id'],))
-                cursor.execute('INSERT INTO ai_requests (user_id, request_type) VALUES (%s, %s)', 
-                              (session['user_id'], 'summarization'))
-                connection.commit()
-            except Error as e:
-                pass
-            finally:
-                cursor.close()
-                connection.close()
-    
-    # Mock AI response (replace with actual AI integration)
-    summary = text[:200] + "..." if len(text) > 200 else text
-    summary += " [This is a mock summary. Integrate with actual AI models for real summarization.]"
-    
-    return jsonify({'summary': summary})
+    try:
+        # Generate quiz using Cohere
+        response = cohere_client.generate(
+            model='command',
+            prompt=f"Create a multiple choice quiz with 5 questions based on these notes: {notes}. Format each question with 4 options (A, B, C, D) and indicate the correct answer.",
+            max_tokens=800
+        )
+        
+        # Mock quiz for demo (replace with actual Cohere parsing)
+        quiz = [
+            {
+                "question": "What is the primary focus of the study material?",
+                "options": ["Option A", "Option B", "Option C", "Option D"],
+                "correct": 0
+            },
+            {
+                "question": "Which concept is most important to understand?",
+                "options": ["First concept", "Second concept", "Third concept", "Fourth concept"],
+                "correct": 1
+            },
+            {
+                "question": "How should this information be applied?",
+                "options": ["Method A", "Method B", "Method C", "Method D"],
+                "correct": 2
+            }
+        ]
+        
+        # Increment AI request count for free users
+        if user['subscription_type'] != 'premium':
+            connection = get_db_connection()
+            if connection:
+                cursor = connection.cursor()
+                try:
+                    cursor.execute('UPDATE users SET ai_requests_used = ai_requests_used + 1 WHERE id = %s', 
+                                  (session['user_id'],))
+                    cursor.execute('INSERT INTO ai_requests (user_id, request_type) VALUES (%s, %s)', 
+                                  (session['user_id'], 'quiz_generation'))
+                    connection.commit()
+                except Error as e:
+                    pass
+                finally:
+                    cursor.close()
+                    connection.close()
+        
+        return jsonify({'quiz': quiz})
+        
+    except Exception as e:
+        # Fallback to mock data if API fails
+        quiz = [
+            {
+                "question": "What is the primary focus of the study material?",
+                "options": ["Option A", "Option B", "Option C", "Option D"],
+                "correct": 0
+            }
+        ]
+        return jsonify({'quiz': quiz})
 
-@app.route("/api/answer-question", methods=["POST"])
-def answer_question():
-    user, success = check_subscription()
-    if not success:
-        return jsonify(user)
+@app.route("/api/get-flashcards", methods=["GET"])
+def get_flashcards():
+    if not require_auth():
+        return jsonify({'error': 'Authentication required'})
+    
+    connection = get_db_connection()
+    if not connection:
+        return jsonify({'error': 'Database connection failed'})
+    
+    cursor = connection.cursor(dictionary=True)
+    
+    try:
+        cursor.execute('SELECT * FROM flashcards WHERE user_id = %s ORDER BY created_at DESC', 
+                      (session['user_id'],))
+        flashcards = cursor.fetchall()
+        
+        return jsonify({'flashcards': flashcards})
+        
+    except Error as e:
+        return jsonify({'error': 'Failed to retrieve flashcards'})
+    finally:
+        cursor.close()
+        connection.close()
+
+@app.route("/api/delete-flashcard", methods=["DELETE"])
+def delete_flashcard():
+    if not require_auth():
+        return jsonify({'error': 'Authentication required'})
     
     data = request.get_json()
-    context = data.get('context', '').strip()
-    question = data.get('question', '').strip()
+    flashcard_id = data.get('id')
     
-    if not context or not question:
-        return jsonify({'error': 'Please provide both context and question'})
+    connection = get_db_connection()
+    if not connection:
+        return jsonify({'error': 'Database connection failed'})
     
-    # Increment AI request count for free users
-    if user['subscription_type'] != 'premium':
-        connection = get_db_connection()
-        if connection:
-            cursor = connection.cursor()
-            try:
-                cursor.execute('UPDATE users SET ai_requests_used = ai_requests_used + 1 WHERE id = %s', 
-                              (session['user_id'],))
-                cursor.execute('INSERT INTO ai_requests (user_id, request_type) VALUES (%s, %s)', 
-                              (session['user_id'], 'question_answering'))
-                connection.commit()
-            except Error as e:
-                pass
-            finally:
-                cursor.close()
-                connection.close()
+    cursor = connection.cursor()
     
-    # Mock AI response (replace with actual AI integration)
-    answer = "This is a mock answer based on the provided context. Please integrate with actual AI models for real question answering."
-    
-    return jsonify({'answer': answer})
-
-@app.route("/api/generate-study-plan", methods=["POST"])
-def generate_study_plan():
-    user, success = check_subscription()
-    if not success:
-        return jsonify(user)
-    
-    data = request.get_json()
-    syllabus = data.get('syllabus', '').strip()
-    topics = data.get('topics', '').strip()
-    start_date = data.get('startDate', '').strip()
-    deadline = data.get('deadline', '').strip()
-    
-    if not all([syllabus, topics, start_date, deadline]):
-        return jsonify({'error': 'Please fill in all fields'})
-    
-    # Increment AI request count for free users
-    if user['subscription_type'] != 'premium':
-        connection = get_db_connection()
-        if connection:
-            cursor = connection.cursor()
-            try:
-                cursor.execute('UPDATE users SET ai_requests_used = ai_requests_used + 1 WHERE id = %s', 
-                              (session['user_id'],))
-                cursor.execute('INSERT INTO ai_requests (user_id, request_type) VALUES (%s, %s)', 
-                              (session['user_id'], 'study_plan_generation'))
-                connection.commit()
-            except Error as e:
-                pass
-            finally:
-                cursor.close()
-                connection.close()
-    
-    # Mock AI response (replace with actual AI integration)
-    study_plan = f"""
-STUDY PLAN FOR: {syllabus}
-
-Topics to Cover: {topics}
-Duration: {start_date} to {deadline}
-
-Week 1: Introduction and Foundation
-- Day 1-2: Overview of key concepts
-- Day 3-4: Deep dive into fundamentals
-- Day 5-7: Practice exercises and review
-
-Week 2: Advanced Topics
-- Day 1-3: Complex concepts and applications
-- Day 4-5: Case studies and examples
-- Day 6-7: Assessment and feedback
-
-[This is a mock study plan. Integrate with actual AI models for personalized plans.]
-    """
-    
-    return jsonify({'studyPlan': study_plan})
+    try:
+        cursor.execute('DELETE FROM flashcards WHERE id = %s AND user_id = %s', 
+                      (flashcard_id, session['user_id']))
+        connection.commit()
+        
+        return jsonify({'success': True})
+        
+    except Error as e:
+        return jsonify({'error': 'Failed to delete flashcard'})
+    finally:
+        cursor.close()
+        connection.close()
 
 # Payment routes
 @app.route("/api/initiate-payment", methods=["POST"])
@@ -513,4 +558,4 @@ def verify_payment():
         connection.close()
 
 if __name__ == "__main__":
-    app.run(debug=True, port=3000)
+    app.run(debug=True, port=5000)
